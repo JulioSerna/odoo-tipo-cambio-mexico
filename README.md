@@ -10,31 +10,12 @@ En el ecosistema de Odoo, el motor de tipo de cambio experimentó un **cambio ar
 2. **En la última versión SaaS (`saas-19.3`) y en Odoo 20.0:** El estándar global del núcleo cambió a buscar la tasa estrictamente anterior (`< date`) a la transacción (PR `odoo/odoo#231948`), con el objetivo de que las tasas apliquen a partir del día siguiente y no varíen durante el día.
 3. **Ajuste para México en SaaS (19.3) y v20.0:** Para compensar este cambio del núcleo y no desfasar la aplicación legal de las tasas del Diario Oficial de la Federación (DOF), el proveedor de Banxico ahora **desplaza la fecha de registro un día hacia atrás** (`effective_rate_date = foreign_rate_date - timedelta(days=1)`).
 
-El resultado funcional es equivalente: **en todas las versiones una factura emitida en una fecha determinada toma la tasa oficial del DOF correspondiente**, pero en SaaS y v20.0 la fecha guardada en base de datos y la consulta del ORM han cambiado sustancialmente.
+> **Resultado Funcional:**  
+> En todas las versiones (<19, SaaS 19.3 y 20.0), una factura emitida en una fecha determinada toma la tasa oficial del DOF correspondiente. La diferencia radica en que en SaaS y v20.0 la fecha guardada en base de datos y la consulta del ORM han cambiado sustancialmente.
 
 ---
 
-## 2. Marco Normativo y Operativo en México
-
-Conforme al Código Fiscal de la Federación (CFF Art. 20) y la Ley Monetaria de los Estados Unidos Mexicanos (Art. 8):
-* El tipo de cambio aplicable para solventar obligaciones es el publicado en el **Diario Oficial de la Federación (DOF)** el día hábil bancario inmediato anterior al de la causación.
-* Banxico publica en su API la serie oficial **`SF60653`** (*Tipo de cambio pesos por dólar E.U.A. para solventar obligaciones pagaderas en la República Mexicana fecha de publicación en el DOF*).
-* La fecha entregada por el API corresponde a la fecha de publicación en el DOF.
-
----
-
-## 3. Comparativa Técnica: <19 vs SaaS (19.3) y Odoo 20.0
-
-| Componente / Lógica | Odoo <19 (LTS / On-premise) | Odoo SaaS (saas-19.3) y Odoo 20.0 | Justificación Técnica |
-| :--- | :--- | :--- | :--- |
-| **Búsqueda en BD (`_get_rates`)** | Fecha menor o igual (`<= date`). | Estrictamente menor (`< date`). | Estándar global de Odoo para evitar fluctuaciones intradía.<br>🔗 [PR odoo/odoo#231948](https://github.com/odoo/odoo/pull/231948) |
-| **Fecha guardada (`res.currency.rate.name`)** | Guarda la fecha exacta devuelta por Banxico (fecha DOF). | Guarda la fecha devuelta por Banxico **menos 1 día**. | Al evaluar con `< date`, si no se restara un día, la factura ignoraría la tasa del día actual.<br>🔗 [Líneas 746-750 de res_config_settings.py](https://github.com/odoo/enterprise/blob/20.0/currency_rate_live/models/res_config_settings.py#L746-L750) |
-| **Registro de MXN** | Sin línea base explícita en retorno. | Inserta explícitamente `MXN` con valor 1.0 en la fecha efectiva calculada (`effective_rate_date`). | Garantiza paridad uniforme para la fecha de corte.<br>🔗 [Commit bce1db4c](https://github.com/odoo/enterprise/commit/bce1db4c) |
-| **Configuración Proxy IAP** | Fijo a `PROXY_URL`. | Configurable mediante el parámetro del sistema `currency_rate_live.iap_proxy_url`. | Permite entornos de pruebas y conectividad local. |
-
----
-
-## 4. Referencias y Enlaces a Repositorios
+## 2. Referencias y Enlaces a Repositorios
 
 Para auditoría técnica o revisión en el código fuente, consultar las siguientes referencias directas:
 
@@ -53,10 +34,10 @@ Para auditoría técnica o revisión en el código fuente, consultar las siguien
 
 ---
 
-## 5. Puntos Clave para el Equipo de Implementación y Soporte
+## 3. Puntos Clave para el Equipo de Implementación y Soporte
 
 1. **Diferenciación entre LTS y SaaS:**  
-   Las bases de datos en versiones tradicionales (<19) mantienen la lógica clásica (`<= date`). En cambio, clientes en Odoo Online / SaaS (como `saas-19.3`) y en la versión mayor **Odoo 20.0** ya incorporan la nueva lógica (`< date`).
+   Las versiones tradicionales (<19) mantienen la lógica clásica (`<= date`). En cambio, clientes en Odoo Online / SaaS (como `saas-19.3`) y en la versión mayor **Odoo 20.0** ya incorporan la nueva lógica (`< date`).
 2. **Fecha visible en pantalla en SaaS y v20.0:**  
    En la interfaz de Odoo (`Contabilidad > Configuración > Monedas > Tasas`), los usuarios observarán que la tasa tiene registrada la fecha del día anterior al que efectivamente aplica. **Esto es el comportamiento esperado en SaaS y v20.0** y responde a la regla de consulta `< date`.
 3. **Cargas manuales y migraciones hacia SaaS / v20.0:**  
@@ -66,7 +47,7 @@ Para auditoría técnica o revisión en el código fuente, consultar las siguien
 
 ---
 
-## 6. Ejemplo Práctico Comparativo
+## 4. Ejemplo Práctico Comparativo
 
 Supongamos el siguiente escenario real de facturación:
 * **Fecha de la transacción:** 02 de Octubre de 2026.
