@@ -59,7 +59,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .logo-container {
@@ -96,21 +96,7 @@
       font-weight: 700;
       line-height: 1.3;
       color: #FFFFFF;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      color: #A0AEC0;
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .subtitle-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      margin-bottom: 0;
     }
 
     /* Content */
@@ -263,6 +249,75 @@
       background: var(--vx-wine-light);
     }
 
+    /* Example Section Styling */
+    .example-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .example-card {
+      background: var(--vx-card-bg);
+      border: 1px solid var(--vx-border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .example-card.highlight {
+      border-color: var(--vx-wine);
+      background: #FDF9FA;
+    }
+
+    .example-header {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .example-header.old {
+      color: var(--vx-primary-dark);
+    }
+
+    .example-header.new {
+      color: var(--vx-wine);
+    }
+
+    .step-item {
+      margin-bottom: 10px;
+      font-size: 13.5px;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .step-item strong {
+      color: var(--vx-primary-dark);
+    }
+
+    .tag-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-left: 4px;
+    }
+
+    .tag-old {
+      background: #E2E8F0;
+      color: #334155;
+    }
+
+    .tag-new {
+      background: #FCE7EB;
+      color: var(--vx-wine);
+    }
+
     .footer {
       background: var(--vx-card-bg);
       border-top: 1px solid var(--vx-border);
@@ -301,12 +356,15 @@
       }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 680px) {
       .header, .content, .footer {
         padding: 24px 20px;
       }
       .title {
         font-size: 20px;
+      }
+      .example-box {
+        grid-template-columns: 1fr;
       }
       .reference-card {
         flex-direction: column;
@@ -337,17 +395,6 @@
         <div class="badge-doc">Informe Técnico</div>
       </div>
       <h1 class="title">Funcionamiento del Tipo de Cambio (Banxico / SAT) en Odoo 20.0, SaaS (19.3) y &lt;19</h1>
-      <div class="subtitle">
-        <div class="subtitle-item">
-          <strong>Área:</strong> Consultoría y Desarrollo
-        </div>
-        <div class="subtitle-item">
-          <strong>Localización:</strong> México (MXN)
-        </div>
-        <div class="subtitle-item">
-          <strong>Fecha:</strong> Octubre 2026
-        </div>
-      </div>
     </header>
 
     <main class="content">
@@ -495,6 +542,70 @@
           <strong>Certeza fiscal:</strong> En todos los entornos (&lt;19, SaaS 19.3 y v20.0), las facturas y pólizas conservan el valor oficial que marca el DOF para la fecha correspondiente.
         </li>
       </ol>
+
+      <!-- Seccion 6: Ejemplo Comparativo -->
+      <h2>6. Ejemplo Práctico Comparativo</h2>
+      <p>
+        Para ilustrar el funcionamiento práctico, supongamos el siguiente escenario real de facturación:
+      </p>
+      <ul>
+        <li><strong>Fecha de la transacción:</strong> 02 de Octubre de 2026.</li>
+        <li><strong>Publicación Banxico en el DOF:</strong> 02 de Octubre de 2026 a <strong>$19.50 MXN / USD</strong>.</li>
+        <li><strong>Objetivo contable:</strong> Emitir una factura por <strong>$1,000 USD</strong> en esa fecha.</li>
+      </ul>
+
+      <div class="example-box">
+        <!-- Tarjeta Odoo <19 -->
+        <div class="example-card">
+          <div class="example-header old">
+            Odoo &lt;19 <span class="tag-badge tag-old">Esquema Tradicional</span>
+          </div>
+          <div class="step-item">
+            <strong>1. Guardado en BD:</strong><br>
+            El cron guarda la tasa con fecha idéntica a la publicación:<br>
+            <code>Fecha: 02/10/2026 | Tasa: 0.051282 (1/19.50)</code>
+          </div>
+          <div class="step-item">
+            <strong>2. Consulta al facturar:</strong><br>
+            Odoo busca con la condición <code>&lt;= date</code>:<br>
+            <code>WHERE name &lt;= '2026-10-02'</code>
+          </div>
+          <div class="step-item">
+            <strong>3. Resultado:</strong><br>
+            Encuentra la tasa del 02/10/2026.<br>
+            <strong>Total: $19,500.00 MXN</strong>.
+          </div>
+        </div>
+
+        <!-- Tarjeta SaaS 19.3 / 20.0 -->
+        <div class="example-card highlight">
+          <div class="example-header new">
+            SaaS (19.3) &amp; Odoo 20.0 <span class="tag-badge tag-new">Nuevo Esquema</span>
+          </div>
+          <div class="step-item">
+            <strong>1. Guardado en BD:</strong><br>
+            El cron resta 1 día antes de guardar:<br>
+            <code>Fecha: 01/10/2026 | Tasa: 0.051282 (1/19.50)</code>
+          </div>
+          <div class="step-item">
+            <strong>2. Consulta al facturar:</strong><br>
+            Odoo busca con la condición <code>&lt; date</code>:<br>
+            <code>WHERE name &lt; '2026-10-02'</code>
+          </div>
+          <div class="step-item">
+            <strong>3. Resultado:</strong><br>
+            Toma la tasa del 01/10/2026 (que contiene los $19.50 del DOF).<br>
+            <strong>Total: $19,500.00 MXN</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">Conclusión del Ejemplo</div>
+        <p class="callout-text">
+          El importe facturado en pesos es <strong>exactamente el mismo ($19,500.00 MXN)</strong> en ambos esquemas. El desplazamiento de fecha a <code>01/10/2026</code> en base de datos es el mecanismo técnico que garantiza que el nuevo operador <code>&lt; date</code> tome la tasa correcta del día fiscal.
+        </p>
+      </div>
 
     </main>
 
