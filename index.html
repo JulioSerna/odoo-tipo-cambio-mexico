@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe Técnico: Funcionamiento del Tipo de Cambio (Banxico / SAT) en Odoo 20.0 vs 17.0, 18.0 y 19.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --vx-primary-dark: #282C2F;     /* Pantone 426C */
+      --vx-wine: #891A2F;             /* Pantone 207C */
+      --vx-wine-light: #AC003F;
+      --vx-gray-light: #F4F6F8;
+      --vx-border: #D6DAE0;           /* Pantone 642C */
+      --vx-blue-accent: #5498CC;
+      --vx-text-main: #282C2F;
+      --vx-text-muted: #5A626A;
+      --vx-bg: #FFFFFF;
+      --vx-card-bg: #FAFBFC;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--vx-text-main);
+      background-color: var(--vx-gray-light);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--vx-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(40, 44, 47, 0.08);
+      overflow: hidden;
+      border: 1px solid var(--vx-border);
+    }
+
+    /* Vauxoo Header */
+    .header {
+      background: linear-gradient(135deg, var(--vx-primary-dark) 0%, #1a1c1e 100%);
+      color: #FFFFFF;
+      padding: 36px 48px;
+      position: relative;
+      border-bottom: 4px solid var(--vx-wine);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #FFFFFF;
+    }
+
+    .logo-text span {
+      color: #E85023;
+    }
+
+    .badge-doc {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #E2E8F0;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    .title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #A0AEC0;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .subtitle-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Content */
+    .content {
+      padding: 48px;
+    }
+
+    h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--vx-wine);
+      margin: 36px 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--vx-border);
+    }
+
+    h2:first-of-type {
+      margin-top: 0;
+    }
+
+    p {
+      margin-bottom: 14px;
+      font-size: 15px;
+      color: #33393F;
+    }
+
+    /* List items */
+    ol, ul {
+      margin: 12px 0 18px 24px;
+      font-size: 15px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      color: #33393F;
+    }
+
+    /* Key concept banner */
+    .callout {
+      background: #FDF4F6;
+      border-left: 4px solid var(--vx-wine);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+
+    .callout-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--vx-wine);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .callout-text {
+      font-size: 14px;
+      color: #4A1521;
+      margin-bottom: 0;
+    }
+
+    /* Table */
+    .table-responsive {
+      overflow-x: auto;
+      margin: 24px 0;
+      border-radius: 8px;
+      border: 1px solid var(--vx-border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    thead {
+      background-color: var(--vx-primary-dark);
+      color: #FFFFFF;
+    }
+
+    th {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 14px 16px;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #EDF0F3;
+      vertical-align: top;
+      color: #374151;
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--vx-card-bg);
+    }
+
+    tr:hover {
+      background-color: #F8FAFC;
+    }
+
+    /* Links */
+    a.vx-link {
+      color: var(--vx-wine);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s ease;
+    }
+
+    a.vx-link:hover {
+      color: var(--vx-wine-light);
+      text-decoration: underline;
+    }
+
+    /* Links list */
+    .reference-card {
+      background: var(--vx-card-bg);
+      border: 1px solid var(--vx-border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .reference-card:hover {
+      border-color: var(--vx-wine);
+      transform: translateY(-1px);
+    }
+
+    .ref-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--vx-primary-dark);
+    }
+
+    .ref-subtitle {
+      font-size: 12px;
+      color: var(--vx-text-muted);
+    }
+
+    .ref-btn {
+      background: var(--vx-wine);
+      color: #FFFFFF !important;
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: background 0.2s ease;
+    }
+
+    .ref-btn:hover {
+      background: var(--vx-wine-light);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--vx-card-bg);
+      border-top: 1px solid var(--vx-border);
+      padding: 24px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--vx-text-muted);
+    }
+
+    .footer-brand {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      color: var(--vx-primary-dark);
+    }
+
+    @media print {
+      body {
+        background: #FFFFFF;
+        padding: 0;
+      }
+      .container {
+        border: none;
+        box-shadow: none;
+      }
+      .header {
+        background: var(--vx-primary-dark) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .ref-btn {
+        background: #FFFFFF !important;
+        color: var(--vx-wine) !important;
+        border: 1px solid var(--vx-wine);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header, .content, .footer {
+        padding: 24px 20px;
+      }
+      .title {
+        font-size: 20px;
+      }
+      .reference-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header with Vauxoo Branding -->
+    <header class="header">
+      <div class="header-top">
+        <div class="logo-container">
+          <svg width="34" height="34" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="20" fill="#891A2F"/>
+            <path d="M26 28L50 74L74 28H58L50 46L42 28H26Z" fill="#FFFFFF"/>
+            <path d="M50 46L58 28H74L50 74V46Z" fill="#E85023"/>
+          </svg>
+          <div class="logo-text">vauxoo</div>
+        </div>
+        <div class="badge-doc">Informe Técnico</div>
+      </div>
+      <h1 class="title">Funcionamiento del Tipo de Cambio (Banxico / SAT) en Odoo 20.0 vs 17.0, 18.0 y 19.0</h1>
+      <div class="subtitle">
+        <div class="subtitle-item">
+          <strong>Área:</strong> Consultoría y Desarrollo
+        </div>
+        <div class="subtitle-item">
+          <strong>Localización:</strong> México (MXN)
+        </div>
+        <div class="subtitle-item">
+          <strong>Fecha:</strong> Octubre 2026
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+      
+      <!-- Seccion 1: Resumen -->
+      <h2>1. Resumen</h2>
+      <p>
+        En <strong>Odoo 20.0</strong>, el motor de tipo de cambio experimentó un <strong>cambio arquitectónico global</strong> en la forma en que el sistema consulta y consume las tasas en transacciones contables (<code>res.currency</code>):
+      </p>
+      <ol>
+        <li>
+          <strong>En Odoo 17.0, 18.0 y 19.0:</strong> El sistema opera bajo el esquema tradicional: busca la tasa con fecha menor o igual (<code>&lt;= date</code>) a la transacción y almacena la fecha exacta devuelta por el API de Banxico.
+        </li>
+        <li>
+          <strong>En Odoo 20.0:</strong> El estándar global del núcleo cambió a buscar la tasa estrictamente anterior (<code>&lt; date</code>) a la transacción, con el objetivo de que las tasas apliquen a partir del día siguiente y no varíen durante el día.
+        </li>
+        <li>
+          <strong>Ajuste para México en v20.0:</strong> Para compensar este cambio del núcleo y no desfasar la aplicación legal de las tasas del Diario Oficial de la Federación (DOF), el proveedor de Banxico en Odoo 20.0 ahora <strong>desplaza la fecha de registro un día hacia atrás</strong>.
+        </li>
+      </ol>
+      <div class="callout">
+        <div class="callout-title">Resultado Funcional</div>
+        <p class="callout-text">
+          En todas las versiones (17.0, 18.0, 19.0 y 20.0), una factura emitida en una fecha determinada toma la tasa oficial del DOF correspondiente. La diferencia radica en que en v20.0 la fecha guardada en base de datos y la consulta del ORM han cambiado sustancialmente.
+        </p>
+      </div>
+
+      <!-- Seccion 2: Marco Normativo -->
+      <h2>2. Marco Normativo y Operativo en México</h2>
+      <p>
+        Conforme al Código Fiscal de la Federación (CFF Art. 20) y la Ley Monetaria de los Estados Unidos Mexicanos (Art. 8):
+      </p>
+      <ul>
+        <li>El tipo de cambio aplicable para solventar obligaciones es el publicado en el <strong>Diario Oficial de la Federación (DOF)</strong> el día hábil bancario inmediato anterior al de la causación.</li>
+        <li>Banxico publica en su API la serie oficial <strong><code>SF60653</code></strong> (<em>Tipo de cambio pesos por dólar E.U.A. para solventar obligaciones pagaderas en la República Mexicana fecha de publicación en el DOF</em>).</li>
+        <li>La fecha entregada por el API corresponde a la fecha de publicación en el DOF.</li>
+      </ul>
+
+      <!-- Seccion 3: Comparativa Tecnica -->
+      <h2>3. Comparativa Técnica: v17.0 / v18.0 / v19.0 vs v20.0</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Componente / Lógica</th>
+              <th>Odoo 17.0, 18.0 y 19.0</th>
+              <th>Odoo 20.0</th>
+              <th>Justificación Técnica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Búsqueda en BD (<code>_get_rates</code>)</strong></td>
+              <td>Fecha menor o igual (<code>&lt;= date</code>).</td>
+              <td>Estrictamente menor (<code>&lt; date</code>).</td>
+              <td>Estándar global de Odoo para evitar fluctuaciones intra-jornada.</td>
+            </tr>
+            <tr>
+              <td><strong>Fecha guardada (<code>res.currency.rate.name</code>)</strong></td>
+              <td>Guarda la fecha exacta devuelta por Banxico (fecha DOF).</td>
+              <td>Guarda la fecha devuelta por Banxico <strong>menos 1 día</strong>.</td>
+              <td>Al evaluar con <code>&lt; date</code>, si no se restara un día, la factura ignoraría la tasa del día actual.</td>
+            </tr>
+            <tr>
+              <td><strong>Registro de MXN</strong></td>
+              <td>En 17/18 sin línea base explícita; en 19.0 inicializa con <code>Date.today()</code>.</td>
+              <td>Inserta explícitamente <code>MXN</code> con valor <code>1.0</code> en la fecha efectiva calculada.</td>
+              <td>Garantiza paridad uniforme para la fecha de corte.</td>
+            </tr>
+            <tr>
+              <td><strong>Configuración Proxy IAP</strong></td>
+              <td>URL fija a <code>iap-services.odoo.com</code>.</td>
+              <td>Configurable vía parámetro <code>currency_rate_live.iap_proxy_url</code>.</td>
+              <td>Permite entornos de pruebas y conectividad local.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Seccion 4: Referencias -->
+      <h2>4. Referencias y Enlaces a Repositorios</h2>
+      <p>Enlaces directos en GitHub a los Pull Requests, commits y archivos fuente involucrados:</p>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">PR Core (Base / Community) — Cambio de regla &lt; date</div>
+          <div class="ref-subtitle">odoo/odoo#231948 • [IMP] base: Currency Rates Fetching</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/odoo/pull/231948" target="_blank" rel="noopener">Ver PR #231948 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">PR Enterprise — Integración del cambio en módulos Enterprise</div>
+          <div class="ref-subtitle">odoo/enterprise#97967 • [IMP] base: Currency Rates Fetching</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/pull/97967" target="_blank" rel="noopener">Ver PR #97967 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">PR Enterprise — Ajuste del desfase para Banxico (v20.0)</div>
+          <div class="ref-subtitle">odoo/enterprise#120366 • [FIX] currency_rate_live: Bank of Mexico Correct Rate</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/pull/120366" target="_blank" rel="noopener">Ver PR #120366 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">Commit específico del ajuste en Banxico (v20.0)</div>
+          <div class="ref-subtitle">odoo/enterprise@bce1db4c • Desfase de -1 día para Banxico</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/commit/bce1db4c" target="_blank" rel="noopener">Ver Commit ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">Ubicación exacta del desfase en el archivo de v20.0</div>
+          <div class="ref-subtitle">odoo/enterprise/currency_rate_live/models/res_config_settings.py#L746-L750</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/blob/20.0/currency_rate_live/models/res_config_settings.py#L746-L750" target="_blank" rel="noopener">Ver Código L746-L750 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">Implementación previa tradicional en v19.0 (sin desfase)</div>
+          <div class="ref-subtitle">odoo/enterprise/currency_rate_live/models/res_config_settings.py (rama 19.0)</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/blob/19.0/currency_rate_live/models/res_config_settings.py" target="_blank" rel="noopener">Ver Archivo 19.0 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">Consulta SQL tradicional en Core v19.0 (&lt;= date)</div>
+          <div class="ref-subtitle">odoo/odoo/addons/base/models/res_currency.py (rama 19.0)</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/odoo/blob/19.0/odoo/addons/base/models/res_currency.py" target="_blank" rel="noopener">Ver Core 19.0 ↗</a>
+      </div>
+
+      <!-- Seccion 5: Puntos Clave -->
+      <h2>5. Puntos Clave para el Equipo de Implementación y Soporte</h2>
+      <ol>
+        <li>
+          <strong>Continuidad entre v17, v18 y v19:</strong> Las versiones 17.0, 18.0 y 19.0 funcionan exactamente con la misma mecánica (búsqueda <code>&lt;= date</code> y fecha idéntica a la del DOF). La ruptura de compatibilidad ocurre exclusivamente al migrar hacia <strong>Odoo 20.0</strong>.
+        </li>
+        <li>
+          <strong>Fecha visible en pantalla en v20.0:</strong> En la interfaz de Odoo 20.0 (<em>Contabilidad &gt; Configuración &gt; Monedas &gt; Tasas</em>), los usuarios observarán que la tasa tiene registrada la fecha del día anterior al que efectivamente aplica. <strong>Esto es el comportamiento esperado en v20.0</strong> y responde a la regla de consulta <code>&lt; date</code>.
+        </li>
+        <li>
+          <strong>Cargas manuales y migraciones hacia v20.0:</strong> Si se importan tipos de cambio de manera manual o vía script en Odoo 20.0, <strong>deben fecharse con un día de anticipación</strong> a la fecha en que deben surtir efecto, o de lo contrario el sistema no las tomará en cuenta el día de la transacción. En 17, 18 y 19 se cargan con la fecha del día en que deben surtir efecto.
+        </li>
+        <li>
+          <strong>Certeza fiscal:</strong> En todas las versiones (17.0, 18.0, 19.0 y 20.0), las facturas y pólizas conservan el valor oficial que marca el DOF para la fecha correspondiente.
+        </li>
+      </ol>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div>
+        Generado para el equipo de <span class="footer-brand">Vauxoo</span>
+      </div>
+      <div>
+        Documentación Interna de Arquitectura Odoo
+      </div>
+    </footer>
+  </div>
+
+</body>
+</html>
