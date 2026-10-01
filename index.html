@@ -161,51 +161,6 @@
       margin-bottom: 0;
     }
 
-    .reference-card {
-      background: var(--vx-card-bg);
-      border: 1px solid var(--vx-border);
-      border-radius: 8px;
-      padding: 14px 18px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: transform 0.15s ease, border-color 0.15s ease;
-    }
-
-    .reference-card:hover {
-      border-color: var(--vx-wine);
-      transform: translateY(-1px);
-    }
-
-    .ref-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--vx-primary-dark);
-    }
-
-    .ref-subtitle {
-      font-size: 12px;
-      color: var(--vx-text-muted);
-    }
-
-    .ref-btn {
-      background: var(--vx-wine);
-      color: #FFFFFF !important;
-      text-decoration: none;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 6px;
-      white-space: nowrap;
-      transition: background 0.2s ease;
-    }
-
-    .ref-btn:hover {
-      background: var(--vx-wine-light);
-    }
-
     /* Example Section Styling */
     .example-box {
       display: grid;
@@ -273,6 +228,51 @@
     .tag-new {
       background: #FCE7EB;
       color: var(--vx-wine);
+    }
+
+    .reference-card {
+      background: var(--vx-card-bg);
+      border: 1px solid var(--vx-border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .reference-card:hover {
+      border-color: var(--vx-wine);
+      transform: translateY(-1px);
+    }
+
+    .ref-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--vx-primary-dark);
+    }
+
+    .ref-subtitle {
+      font-size: 12px;
+      color: var(--vx-text-muted);
+    }
+
+    .ref-btn {
+      background: var(--vx-wine);
+      color: #FFFFFF !important;
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: background 0.2s ease;
+    }
+
+    .ref-btn:hover {
+      background: var(--vx-wine-light);
     }
 
     .footer {
@@ -379,60 +379,8 @@
         </p>
       </div>
 
-      <!-- Seccion 2: Referencias -->
-      <h2>2. Referencias y Enlaces a Repositorios</h2>
-      <p>Enlaces directos en GitHub a los Pull Requests, commits y archivos fuente involucrados:</p>
-
-      <div class="reference-card">
-        <div>
-          <div class="ref-title">PR Core (Base / Community) — Cambio de regla &lt; date</div>
-          <div class="ref-subtitle">odoo/odoo#231948 • [IMP] base: Currency Rates Fetching</div>
-        </div>
-        <a class="ref-btn" href="https://github.com/odoo/odoo/pull/231948" target="_blank" rel="noopener">Ver PR #231948 ↗</a>
-      </div>
-
-      <div class="reference-card">
-        <div>
-          <div class="ref-title">PR Enterprise — Integración del cambio en módulos Enterprise</div>
-          <div class="ref-subtitle">odoo/enterprise#97967 • [IMP] base: Currency Rates Fetching</div>
-        </div>
-        <a class="ref-btn" href="https://github.com/odoo/enterprise/pull/97967" target="_blank" rel="noopener">Ver PR #97967 ↗</a>
-      </div>
-
-      <div class="reference-card">
-        <div>
-          <div class="ref-title">PR Enterprise — Ajuste del desfase para Banxico</div>
-          <div class="ref-subtitle">odoo/enterprise#120366 • [FIX] currency_rate_live: Bank of Mexico Correct Rate</div>
-        </div>
-        <a class="ref-btn" href="https://github.com/odoo/enterprise/pull/120366" target="_blank" rel="noopener">Ver PR #120366 ↗</a>
-      </div>
-
-      <div class="reference-card">
-        <div>
-          <div class="ref-title">Commit específico del ajuste en Banxico</div>
-          <div class="ref-subtitle">odoo/enterprise@bce1db4c • Desfase de -1 día para Banxico</div>
-        </div>
-        <a class="ref-btn" href="https://github.com/odoo/enterprise/commit/bce1db4c" target="_blank" rel="noopener">Ver Commit ↗</a>
-      </div>
-
-      <div class="reference-card">
-        <div>
-          <div class="ref-title">Ubicación del desfase en SaaS (saas-19.3)</div>
-          <div class="ref-subtitle">odoo/enterprise/currency_rate_live/models/res_config_settings.py#L746-L748 (rama saas-19.3)</div>
-        </div>
-        <a class="ref-btn" href="https://github.com/odoo/enterprise/blob/saas-19.3/currency_rate_live/models/res_config_settings.py#L746-L748" target="_blank" rel="noopener">Ver saas-19.3 ↗</a>
-      </div>
-
-      <div class="reference-card">
-        <div>
-          <div class="ref-title">Ubicación exacta del desfase en el archivo de v20.0</div>
-          <div class="ref-subtitle">odoo/enterprise/currency_rate_live/models/res_config_settings.py#L746-L750 (rama 20.0)</div>
-        </div>
-        <a class="ref-btn" href="https://github.com/odoo/enterprise/blob/20.0/currency_rate_live/models/res_config_settings.py#L746-L750" target="_blank" rel="noopener">Ver Código L746-L750 ↗</a>
-      </div>
-
-      <!-- Seccion 3: Puntos Clave -->
-      <h2>3. Puntos Clave para el Equipo de Implementación y Soporte</h2>
+      <!-- Seccion 2: Puntos Clave -->
+      <h2>2. Puntos Clave para el Equipo de Implementación y Soporte</h2>
       <ol>
         <li>
           <strong>Diferenciación entre LTS y SaaS:</strong> Las versiones tradicionales (&lt;19) mantienen la lógica clásica (<code>&lt;= date</code>). En cambio, clientes en Odoo Online / SaaS (como <code>saas-19.3</code>) y en la versión mayor <strong>Odoo 20.0</strong> ya incorporan la nueva lógica (<code>&lt; date</code>).
@@ -448,8 +396,8 @@
         </li>
       </ol>
 
-      <!-- Seccion 4: Ejemplo Comparativo -->
-      <h2>4. Ejemplo Práctico Comparativo</h2>
+      <!-- Seccion 3: Ejemplo Comparativo -->
+      <h2>3. Ejemplo Práctico Comparativo</h2>
       <p>
         Para ilustrar el funcionamiento práctico, supongamos el siguiente escenario real de facturación:
       </p>
@@ -510,6 +458,58 @@
         <p class="callout-text">
           El importe facturado en pesos es <strong>exactamente el mismo ($19,500.00 MXN)</strong> en ambos esquemas. El desplazamiento de fecha a <code>01/10/2026</code> en base de datos es el mecanismo técnico que garantiza que el nuevo operador <code>&lt; date</code> tome la tasa correcta del día fiscal.
         </p>
+      </div>
+
+      <!-- Seccion 4: Referencias (Al final) -->
+      <h2>4. Referencias y Enlaces a Repositorios</h2>
+      <p>Enlaces directos en GitHub a los Pull Requests, commits y archivos fuente involucrados:</p>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">PR Core (Base / Community) — Cambio de regla &lt; date</div>
+          <div class="ref-subtitle">odoo/odoo#231948 • [IMP] base: Currency Rates Fetching</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/odoo/pull/231948" target="_blank" rel="noopener">Ver PR #231948 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">PR Enterprise — Integración del cambio en módulos Enterprise</div>
+          <div class="ref-subtitle">odoo/enterprise#97967 • [IMP] base: Currency Rates Fetching</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/pull/97967" target="_blank" rel="noopener">Ver PR #97967 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">PR Enterprise — Ajuste del desfase para Banxico</div>
+          <div class="ref-subtitle">odoo/enterprise#120366 • [FIX] currency_rate_live: Bank of Mexico Correct Rate</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/pull/120366" target="_blank" rel="noopener">Ver PR #120366 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">Commit específico del ajuste en Banxico</div>
+          <div class="ref-subtitle">odoo/enterprise@bce1db4c • Desfase de -1 día para Banxico</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/commit/bce1db4c" target="_blank" rel="noopener">Ver Commit ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">Ubicación del desfase en SaaS (saas-19.3)</div>
+          <div class="ref-subtitle">odoo/enterprise/currency_rate_live/models/res_config_settings.py#L746-L748 (rama saas-19.3)</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/blob/saas-19.3/currency_rate_live/models/res_config_settings.py#L746-L748" target="_blank" rel="noopener">Ver saas-19.3 ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">Ubicación exacta del desfase en el archivo de v20.0</div>
+          <div class="ref-subtitle">odoo/enterprise/currency_rate_live/models/res_config_settings.py#L746-L750 (rama 20.0)</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/blob/20.0/currency_rate_live/models/res_config_settings.py#L746-L750" target="_blank" rel="noopener">Ver Código L746-L750 ↗</a>
       </div>
 
     </main>

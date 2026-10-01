@@ -15,26 +15,7 @@ En el ecosistema de Odoo, el motor de tipo de cambio experimentó un **cambio ar
 
 ---
 
-## 2. Referencias y Enlaces a Repositorios
-
-Para auditoría técnica o revisión en el código fuente, consultar las siguientes referencias directas:
-
-* **PR Core (Base / Community) — Cambio de regla `< date`:**  
-  🔗 [odoo/odoo#231948: [IMP] base: Currency Rates Fetching](https://github.com/odoo/odoo/pull/231948)
-* **PR Enterprise — Integración del cambio en módulos Enterprise:**  
-  🔗 [odoo/enterprise#97967: [IMP] base: Currency Rates Fetching](https://github.com/odoo/enterprise/pull/97967)
-* **PR Enterprise — Ajuste del desfase para Banxico:**  
-  🔗 [odoo/enterprise#120366: [FIX] currency_rate_live: Bank of Mexico Correct Rate](https://github.com/odoo/enterprise/pull/120366)
-* **Commit específico del ajuste en Banxico:**  
-  🔗 [Commit bce1db4c en odoo/enterprise](https://github.com/odoo/enterprise/commit/bce1db4c)
-* **Ubicación del desfase en SaaS (saas-19.3):**  
-  🔗 [res_config_settings.py#L746-L748 en saas-19.3](https://github.com/odoo/enterprise/blob/saas-19.3/currency_rate_live/models/res_config_settings.py#L746-L748)
-* **Ubicación exacta del desfase en el archivo de v20.0:**  
-  🔗 [res_config_settings.py#L746-L750 en 20.0](https://github.com/odoo/enterprise/blob/20.0/currency_rate_live/models/res_config_settings.py#L746-L750)
-
----
-
-## 3. Puntos Clave para el Equipo de Implementación y Soporte
+## 2. Puntos Clave para el Equipo de Implementación y Soporte
 
 1. **Diferenciación entre LTS y SaaS:**  
    Las versiones tradicionales (<19) mantienen la lógica clásica (`<= date`). En cambio, clientes en Odoo Online / SaaS (como `saas-19.3`) y en la versión mayor **Odoo 20.0** ya incorporan la nueva lógica (`< date`).
@@ -47,7 +28,7 @@ Para auditoría técnica o revisión en el código fuente, consultar las siguien
 
 ---
 
-## 4. Ejemplo Práctico Comparativo
+## 3. Ejemplo Práctico Comparativo
 
 Supongamos el siguiente escenario real de facturación:
 * **Fecha de la transacción:** 02 de Octubre de 2026.
@@ -70,3 +51,22 @@ Supongamos el siguiente escenario real de facturación:
 
 > **Conclusión del Ejemplo:**  
 > El importe facturado en pesos es **exactamente el mismo ($19,500.00 MXN)** en ambos esquemas. El desplazamiento de fecha a `01/10/2026` en base de datos es el mecanismo técnico que garantiza que el nuevo operador `< date` tome la tasa correcta del día fiscal.
+
+---
+
+## 4. Referencias y Enlaces a Repositorios
+
+Para auditoría técnica o revisión en el código fuente, consultar las siguientes referencias directas:
+
+* **PR Core (Base / Community) — Cambio de regla `< date`:**  
+  🔗 [odoo/odoo#231948: [IMP] base: Currency Rates Fetching](https://github.com/odoo/odoo/pull/231948)
+* **PR Enterprise — Integración del cambio en módulos Enterprise:**  
+  🔗 [odoo/enterprise#97967: [IMP] base: Currency Rates Fetching](https://github.com/odoo/enterprise/pull/97967)
+* **PR Enterprise — Ajuste del desfase para Banxico:**  
+  🔗 [odoo/enterprise#120366: [FIX] currency_rate_live: Bank of Mexico Correct Rate](https://github.com/odoo/enterprise/pull/120366)
+* **Commit específico del ajuste en Banxico:**  
+  🔗 [Commit bce1db4c en odoo/enterprise](https://github.com/odoo/enterprise/commit/bce1db4c)
+* **Ubicación del desfase en SaaS (saas-19.3):**  
+  🔗 [res_config_settings.py#L746-L748 en saas-19.3](https://github.com/odoo/enterprise/blob/saas-19.3/currency_rate_live/models/res_config_settings.py#L746-L748)
+* **Ubicación exacta del desfase en el archivo de v20.0:**  
+  🔗 [res_config_settings.py#L746-L750 en 20.0](https://github.com/odoo/enterprise/blob/20.0/currency_rate_live/models/res_config_settings.py#L746-L750)
