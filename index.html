@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Informe Técnico: Funcionamiento del Tipo de Cambio (Banxico / SAT) en Odoo 20.0 vs 17.0, 18.0 y 19.0</title>
+  <title>Informe Técnico: Funcionamiento del Tipo de Cambio (Banxico / SAT) en Odoo 20.0, SaaS (19.4) y &le; 19.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -77,10 +77,6 @@
       color: #FFFFFF;
     }
 
-    .logo-text span {
-      color: #E85023;
-    }
-
     .badge-doc {
       background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -145,7 +141,6 @@
       color: #33393F;
     }
 
-    /* List items */
     ol, ul {
       margin: 12px 0 18px 24px;
       font-size: 15px;
@@ -156,7 +151,6 @@
       color: #33393F;
     }
 
-    /* Key concept banner */
     .callout {
       background: #FDF4F6;
       border-left: 4px solid var(--vx-wine);
@@ -181,7 +175,6 @@
       margin-bottom: 0;
     }
 
-    /* Table */
     .table-responsive {
       overflow-x: auto;
       margin: 24px 0;
@@ -225,23 +218,6 @@
       background-color: #F8FAFC;
     }
 
-    /* Links */
-    a.vx-link {
-      color: var(--vx-wine);
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: color 0.2s ease;
-    }
-
-    a.vx-link:hover {
-      color: var(--vx-wine-light);
-      text-decoration: underline;
-    }
-
-    /* Links list */
     .reference-card {
       background: var(--vx-card-bg);
       border: 1px solid var(--vx-border);
@@ -287,7 +263,6 @@
       background: var(--vx-wine-light);
     }
 
-    /* Footer */
     .footer {
       background: var(--vx-card-bg);
       border-top: 1px solid var(--vx-border);
@@ -349,7 +324,6 @@
 <body>
 
   <div class="container">
-    <!-- Header with Vauxoo Branding -->
     <header class="header">
       <div class="header-top">
         <div class="logo-container">
@@ -362,7 +336,7 @@
         </div>
         <div class="badge-doc">Informe Técnico</div>
       </div>
-      <h1 class="title">Funcionamiento del Tipo de Cambio (Banxico / SAT) en Odoo 20.0 vs 17.0, 18.0 y 19.0</h1>
+      <h1 class="title">Funcionamiento del Tipo de Cambio (Banxico / SAT) en Odoo 20.0, SaaS (19.4) y &le; 19.0</h1>
       <div class="subtitle">
         <div class="subtitle-item">
           <strong>Área:</strong> Consultoría y Desarrollo
@@ -376,29 +350,28 @@
       </div>
     </header>
 
-    <!-- Main Content -->
     <main class="content">
       
       <!-- Seccion 1: Resumen -->
       <h2>1. Resumen</h2>
       <p>
-        En <strong>Odoo 20.0</strong>, el motor de tipo de cambio experimentó un <strong>cambio arquitectónico global</strong> en la forma en que el sistema consulta y consume las tasas en transacciones contables (<code>res.currency</code>):
+        En el ecosistema de Odoo, el motor de tipo de cambio experimentó un <strong>cambio arquitectónico</strong> en la forma en que el sistema consulta y consume las tasas en transacciones contables (<code>res.currency</code>):
       </p>
       <ol>
         <li>
-          <strong>En Odoo 17.0, 18.0 y 19.0:</strong> El sistema opera bajo el esquema tradicional: busca la tasa con fecha menor o igual (<code>&lt;= date</code>) a la transacción y almacena la fecha exacta devuelta por el API de Banxico.
+          <strong>En versiones tradicionales (&le; 19.0 LTS / On-premise):</strong> El sistema opera bajo el esquema histórico: busca la tasa con fecha menor o igual (<code>&lt;= date</code>) a la transacción y almacena la fecha exacta devuelta por el API de Banxico (fecha de publicación en el DOF).
         </li>
         <li>
-          <strong>En Odoo 20.0:</strong> El estándar global del núcleo cambió a buscar la tasa estrictamente anterior (<code>&lt; date</code>) a la transacción, con el objetivo de que las tasas apliquen a partir del día siguiente y no varíen durante el día.
+          <strong>En la última versión SaaS (<code>saas-19.4</code>) y en Odoo 20.0:</strong> El estándar global del núcleo cambió a buscar la tasa estrictamente anterior (<code>&lt; date</code>) a la transacción, con el objetivo de que las tasas apliquen a partir del día siguiente y no varíen durante el día.
         </li>
         <li>
-          <strong>Ajuste para México en v20.0:</strong> Para compensar este cambio del núcleo y no desfasar la aplicación legal de las tasas del Diario Oficial de la Federación (DOF), el proveedor de Banxico en Odoo 20.0 ahora <strong>desplaza la fecha de registro un día hacia atrás</strong>.
+          <strong>Ajuste para México en SaaS y v20.0:</strong> Para compensar este cambio del núcleo y no desfasar la aplicación legal de las tasas del Diario Oficial de la Federación (DOF), el proveedor de Banxico ahora <strong>desplaza la fecha de registro un día hacia atrás</strong> (<code>effective_rate_date = foreign_rate_date - timedelta(days=1)</code>).
         </li>
       </ol>
       <div class="callout">
         <div class="callout-title">Resultado Funcional</div>
         <p class="callout-text">
-          En todas las versiones (17.0, 18.0, 19.0 y 20.0), una factura emitida en una fecha determinada toma la tasa oficial del DOF correspondiente. La diferencia radica en que en v20.0 la fecha guardada en base de datos y la consulta del ORM han cambiado sustancialmente.
+          En todas las versiones (&le; 19.0, SaaS y 20.0), una factura emitida en una fecha determinada toma la tasa oficial del DOF correspondiente. La diferencia radica en que en SaaS y v20.0 la fecha guardada en base de datos y la consulta del ORM han cambiado sustancialmente.
         </p>
       </div>
 
@@ -414,14 +387,14 @@
       </ul>
 
       <!-- Seccion 3: Comparativa Tecnica -->
-      <h2>3. Comparativa Técnica: v17.0 / v18.0 / v19.0 vs v20.0</h2>
+      <h2>3. Comparativa Técnica: &le; 19.0 vs SaaS (19.4) y Odoo 20.0</h2>
       <div class="table-responsive">
         <table>
           <thead>
             <tr>
               <th>Componente / Lógica</th>
-              <th>Odoo 17.0, 18.0 y 19.0</th>
-              <th>Odoo 20.0</th>
+              <th>Odoo &le; 19.0 (LTS / On-premise)</th>
+              <th>Odoo SaaS (saas-19.4) y Odoo 20.0</th>
               <th>Justificación Técnica</th>
             </tr>
           </thead>
@@ -440,13 +413,13 @@
             </tr>
             <tr>
               <td><strong>Registro de MXN</strong></td>
-              <td>En 17/18 sin línea base explícita; en 19.0 inicializa con <code>Date.today()</code>.</td>
+              <td>Inicializa con <code>Date.today()</code> en 19.0.</td>
               <td>Inserta explícitamente <code>MXN</code> con valor <code>1.0</code> en la fecha efectiva calculada.</td>
               <td>Garantiza paridad uniforme para la fecha de corte.</td>
             </tr>
             <tr>
               <td><strong>Configuración Proxy IAP</strong></td>
-              <td>URL fija a <code>iap-services.odoo.com</code>.</td>
+              <td>Fijo a <code>iap-services.odoo.com</code>.</td>
               <td>Configurable vía parámetro <code>currency_rate_live.iap_proxy_url</code>.</td>
               <td>Permite entornos de pruebas y conectividad local.</td>
             </tr>
@@ -476,7 +449,7 @@
 
       <div class="reference-card">
         <div>
-          <div class="ref-title">PR Enterprise — Ajuste del desfase para Banxico (v20.0)</div>
+          <div class="ref-title">PR Enterprise — Ajuste del desfase para Banxico</div>
           <div class="ref-subtitle">odoo/enterprise#120366 • [FIX] currency_rate_live: Bank of Mexico Correct Rate</div>
         </div>
         <a class="ref-btn" href="https://github.com/odoo/enterprise/pull/120366" target="_blank" rel="noopener">Ver PR #120366 ↗</a>
@@ -484,10 +457,18 @@
 
       <div class="reference-card">
         <div>
-          <div class="ref-title">Commit específico del ajuste en Banxico (v20.0)</div>
+          <div class="ref-title">Commit específico del ajuste en Banxico</div>
           <div class="ref-subtitle">odoo/enterprise@bce1db4c • Desfase de -1 día para Banxico</div>
         </div>
         <a class="ref-btn" href="https://github.com/odoo/enterprise/commit/bce1db4c" target="_blank" rel="noopener">Ver Commit ↗</a>
+      </div>
+
+      <div class="reference-card">
+        <div>
+          <div class="ref-title">Ubicación del desfase en SaaS (saas-19.4)</div>
+          <div class="ref-subtitle">odoo/enterprise/currency_rate_live/models/res_config_settings.py (rama saas-19.4)</div>
+        </div>
+        <a class="ref-btn" href="https://github.com/odoo/enterprise/blob/saas-19.4/currency_rate_live/models/res_config_settings.py" target="_blank" rel="noopener">Ver saas-19.4 ↗</a>
       </div>
 
       <div class="reference-card">
@@ -500,40 +481,31 @@
 
       <div class="reference-card">
         <div>
-          <div class="ref-title">Implementación previa tradicional en v19.0 (sin desfase)</div>
+          <div class="ref-title">Implementación previa tradicional en v19.0 LTS (sin desfase)</div>
           <div class="ref-subtitle">odoo/enterprise/currency_rate_live/models/res_config_settings.py (rama 19.0)</div>
         </div>
         <a class="ref-btn" href="https://github.com/odoo/enterprise/blob/19.0/currency_rate_live/models/res_config_settings.py" target="_blank" rel="noopener">Ver Archivo 19.0 ↗</a>
-      </div>
-
-      <div class="reference-card">
-        <div>
-          <div class="ref-title">Consulta SQL tradicional en Core v19.0 (&lt;= date)</div>
-          <div class="ref-subtitle">odoo/odoo/addons/base/models/res_currency.py (rama 19.0)</div>
-        </div>
-        <a class="ref-btn" href="https://github.com/odoo/odoo/blob/19.0/odoo/addons/base/models/res_currency.py" target="_blank" rel="noopener">Ver Core 19.0 ↗</a>
       </div>
 
       <!-- Seccion 5: Puntos Clave -->
       <h2>5. Puntos Clave para el Equipo de Implementación y Soporte</h2>
       <ol>
         <li>
-          <strong>Continuidad entre v17, v18 y v19:</strong> Las versiones 17.0, 18.0 y 19.0 funcionan exactamente con la misma mecánica (búsqueda <code>&lt;= date</code> y fecha idéntica a la del DOF). La ruptura de compatibilidad ocurre exclusivamente al migrar hacia <strong>Odoo 20.0</strong>.
+          <strong>Diferenciación entre LTS y SaaS:</strong> Las bases de datos en versiones estables LTS tradicionales (&le; 19.0) mantienen la lógica clásica (<code>&lt;= date</code>). En cambio, clientes alojados en Odoo Online / SaaS (como <code>saas-19.4</code>) y en la nueva versión mayor <strong>Odoo 20.0</strong> ya incorporan la nueva lógica (<code>&lt; date</code>).
         </li>
         <li>
-          <strong>Fecha visible en pantalla en v20.0:</strong> En la interfaz de Odoo 20.0 (<em>Contabilidad &gt; Configuración &gt; Monedas &gt; Tasas</em>), los usuarios observarán que la tasa tiene registrada la fecha del día anterior al que efectivamente aplica. <strong>Esto es el comportamiento esperado en v20.0</strong> y responde a la regla de consulta <code>&lt; date</code>.
+          <strong>Fecha visible en pantalla en SaaS y v20.0:</strong> En la interfaz de Odoo (<em>Contabilidad &gt; Configuración &gt; Monedas &gt; Tasas</em>), los usuarios observarán que la tasa tiene registrada la fecha del día anterior al que efectivamente aplica. <strong>Esto es el comportamiento esperado en SaaS y v20.0</strong> y responde a la regla de consulta <code>&lt; date</code>.
         </li>
         <li>
-          <strong>Cargas manuales y migraciones hacia v20.0:</strong> Si se importan tipos de cambio de manera manual o vía script en Odoo 20.0, <strong>deben fecharse con un día de anticipación</strong> a la fecha en que deben surtir efecto, o de lo contrario el sistema no las tomará en cuenta el día de la transacción. En 17, 18 y 19 se cargan con la fecha del día en que deben surtir efecto.
+          <strong>Cargas manuales y migraciones hacia SaaS / v20.0:</strong> Si se importan tipos de cambio de manera manual o vía script en entornos SaaS o v20.0, <strong>deben fecharse con un día de anticipación</strong> a la fecha en que deben surtir efecto, o de lo contrario el sistema no las tomará en cuenta el día de la transacción. En versiones &le; 19.0 se cargan con la fecha del día en que deben surtir efecto.
         </li>
         <li>
-          <strong>Certeza fiscal:</strong> En todas las versiones (17.0, 18.0, 19.0 y 20.0), las facturas y pólizas conservan el valor oficial que marca el DOF para la fecha correspondiente.
+          <strong>Certeza fiscal:</strong> En todos los entornos (&le; 19.0, SaaS y v20.0), las facturas y pólizas conservan el valor oficial que marca el DOF para la fecha correspondiente.
         </li>
       </ol>
 
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
       <div>
         Generado para el equipo de <span class="footer-brand">Vauxoo</span>
